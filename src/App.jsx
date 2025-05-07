@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import Table from "./components/Table";
 
-function App() {
-  const [count, setCount] = useState(0)
+const DATA_URL =
+  "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec?callback=handleData";
+
+export default function App() {
+  const [lineup, setLineup] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [columns, setColumns] = useState([]);
+
+  useEffect(() => {
+    fetch(DATA_URL)
+      .then(res => res.json())
+      .then(data => {
+        // now data.Config and data.Players are ready
+        setLineup(data.Config);    // or however you want to map
+        setPlayers(data.Players);
+        deriveColumns(data.Players);
+      })
+      .catch(err => console.error('Fetch/json error:', err));
+  }, []);
+  
+  // helper to turn an object-keys list into column defs
+  function deriveColumns(sampleArray) {
+    if (!sampleArray.length) return;
+    const cols = Object.keys(sampleArray[0])
+      // drop any internal flags if you like:
+      .filter((key) => key !== "is_lineup")
+      .map((key) => ({
+        Header: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        accessor: key,
+      }));
+    setColumns(cols);
+  }
+
+  if (!columns.length) {
+    return <div className="m-8">Loading data…</div>;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <main className="m-8 space-y-8">
+      <h1 className="text-2xl font-bold">DFS UI Dashboard</h1>
 
-export default App
+      <section>
+        <h2 className="text-xl mb-2">My Lineup</h2>
+        <Table columns={columns} data={lineup} />
+      </section>
+
+      <section>
+        <h2 className="text-xl mb-2">All Players</h2>
+        <Table columns={columns} data={players} />
+      </section>
+    </main>
+  );
+}
