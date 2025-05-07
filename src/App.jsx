@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Table from "./components/Table";
 
 const DATA_URL =
-  "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec?callback=handleData";
+  "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
 
 export default function App() {
   const [lineup, setLineup] = useState([]);
@@ -13,13 +13,13 @@ export default function App() {
     fetch(DATA_URL)
       .then(res => res.json())
       .then(data => {
-        // now data.Config and data.Players are ready
-        setLineup(data.Config);    // or however you want to map
+        setLineup(data.Config);
         setPlayers(data.Players);
         deriveColumns(data.Players);
       })
-      .catch(err => console.error('Fetch/json error:', err));
+      .catch(err => console.error(err));
   }, []);
+  
   
   // helper to turn an object-keys list into column defs
   function deriveColumns(sampleArray) {
