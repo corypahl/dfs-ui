@@ -2,7 +2,7 @@
 import React from 'react';
 
 /**
- * A generic table component.
+ * A generic table component with dark-mode styling.
  * Props:
  * - columns: Array of { Header: string, accessor: string }
  * - data: Array of data objects matching accessors
@@ -11,11 +11,11 @@ import React from 'react';
  */
 export default function Table({ columns = [], data = [], onRowClick, disabledRow }) {
   return (
-    <table className="min-w-full border-collapse">
+    <table>
       <thead>
         <tr>
           {columns.map(col => (
-            <th key={col.accessor} className="border-b px-4 py-2 text-left">
+            <th key={col.accessor} className={col.sortable ? 'sortable' : ''}>
               {col.Header}
             </th>
           ))}
@@ -25,22 +25,20 @@ export default function Table({ columns = [], data = [], onRowClick, disabledRow
         {data.map((row, rowIndex) => {
           const isDisabled = typeof disabledRow === 'function' && disabledRow(row);
           const isClickable = typeof onRowClick === 'function' && !isDisabled;
+          const rowClasses = [];
+          if (isDisabled) rowClasses.push('disabled');
+          else if (isClickable) rowClasses.push('clickable');
+
           return (
             <tr
               key={rowIndex}
-              className={
-                isDisabled
-                  ? 'opacity-50 cursor-not-allowed'
-                  : isClickable
-                  ? 'hover:bg-gray-50 cursor-pointer'
-                  : ''
-              }
+              className={rowClasses.join(' ')}
               onClick={() => {
                 if (isClickable) onRowClick(row, rowIndex);
               }}
             >
               {columns.map(col => (
-                <td key={col.accessor} className="border-b px-4 py-2">
+                <td key={col.accessor}>
                   {row[col.accessor]}
                 </td>
               ))}

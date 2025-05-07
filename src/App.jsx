@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useState, useEffect } from "react";
-import Table from "./components/Table";
+import Table from "./components/table";
 
 const DATA_URL =
   "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -98,7 +98,7 @@ const mapObj = JSON.parse(sanitizedMap);
 
   return (
     <main className="m-8 space-y-8">
-      <h1 className="text-2xl font-bold">DFS UI Dashboard</h1>
+      <h1 className="text-2xl font-bold">DFS Lineup Builder</h1>
 
       <section>
         <h2 className="text-xl mb-2">My Lineup (click to remove)</h2>
