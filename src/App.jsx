@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useState, useEffect } from "react";
-import Table from "./components/table";
+import Table from "./components/Table";
 
 const DATA_URL =
   "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -15,27 +15,17 @@ const lineupColumns = [
   { Header: "Grade",    accessor: "grade"    },
 ];
 
-// Map lineup slots to acceptable player positions
-const positionMap = {
-  "P":    ["SP", "RP"],
-  "C/1B": ["C", "1B"],
-  "2B":   ["2B"],
-  "3B":   ["3B"],
-  "SS":   ["SS"],
-  "OF":   ["LF", "CF", "RF"],
-  "UTIL": ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"],
-};
-
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [playerColumns, setPlayerColumns] = useState([]);
   const [lineup, setLineup] = useState([]);
+  const [positionMap, setPositionMap] = useState({});
 
   useEffect(() => {
     fetch(DATA_URL)
       .then(res => res.json())
       .then(data => {
-        // Load players and derive columns
+        // Load all players and derive columns
         setPlayers(data.Players);
         const cols = Object.keys(data.Players[0]).map(key => ({
           Header: key,
@@ -43,8 +33,20 @@ export default function App() {
         }));
         setPlayerColumns(cols);
 
-        // Initialize lineup slots
+        // Parse position map from Config
         const cfg = data.Config[0];
+        try {
+          // Sanitize single quotes to valid JSON double quotes
+const rawMap = cfg.Map;
+const sanitizedMap = rawMap.replace(/'/g, '"');
+const mapObj = JSON.parse(sanitizedMap);
+          setPositionMap(mapObj);
+        } catch (err) {
+          console.error('Error parsing position map:', err);
+          setPositionMap({});
+        }
+
+        // Initialize empty lineup slots based on config
         const slots = cfg.Lineup.split(",").map(pos => ({
           position: pos,
           player:  "",
@@ -58,11 +60,13 @@ export default function App() {
       .catch(console.error);
   }, []);
 
-  // Add a player into the first compatible empty slot
+  // Add a player into the first slot where their position fits
   function addToLineup(playerObj) {
     setLineup(curr => {
       const idx = curr.findIndex(slot =>
-        !slot.player && (positionMap[slot.position] || [slot.position]).includes(playerObj.Pos)
+        !slot.player &&
+        Object.prototype.hasOwnProperty.call(positionMap, slot.position) &&
+        positionMap[slot.position].includes(playerObj.Pos)
       );
       if (idx === -1) return curr;
       const next = [...curr];
@@ -87,7 +91,8 @@ export default function App() {
     });
   }
 
-  if (!playerColumns.length || !lineup.length) {
+  // Ensure data and map are loaded
+  if (!playerColumns.length || !lineup.length || !Object.keys(positionMap).length) {
     return <div className="m-8">Loading…</div>;
   }
 
@@ -116,7 +121,8 @@ export default function App() {
             !lineup.some(
               slot =>
                 !slot.player &&
-                (positionMap[slot.position] || [slot.position]).includes(player.Pos)
+                Object.prototype.hasOwnProperty.call(positionMap, slot.position) &&
+                positionMap[slot.position].includes(player.Pos)
             )
           }
         />
