@@ -158,7 +158,7 @@ export default function App() {
 
   return (
     <main>
-      <h1>DFS UI Dashboard</h1>
+      <h1>DFS Lineup Builder</h1>
 
       <section>
         <h2>My Lineup (click to remove)</h2>
