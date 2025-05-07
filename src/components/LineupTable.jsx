@@ -1,4 +1,4 @@
-import Table from './table';
+import Table from "./components/Table";
 
 export default function LineupTable({ config }) {
   // parse positions & totals

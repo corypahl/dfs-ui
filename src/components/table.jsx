@@ -6,7 +6,7 @@ import React from 'react';
  * Props:
  * - columns: Array of { Header: string, accessor: string }
  * - data: Array of data objects matching accessors
- * - onRowClick: optional function(row) callback when a row is clicked
+ * - onRowClick: optional function(row, rowIndex) callback when a row is clicked
  * - disabledRow: optional function(row) returning true to disable a row
  */
 export default function Table({ columns = [], data = [], onRowClick, disabledRow }) {
@@ -15,10 +15,7 @@ export default function Table({ columns = [], data = [], onRowClick, disabledRow
       <thead>
         <tr>
           {columns.map(col => (
-            <th
-              key={col.accessor}
-              className="border-b px-4 py-2 text-left"
-            >
+            <th key={col.accessor} className="border-b px-4 py-2 text-left">
               {col.Header}
             </th>
           ))}
@@ -39,7 +36,7 @@ export default function Table({ columns = [], data = [], onRowClick, disabledRow
                   : ''
               }
               onClick={() => {
-                if (isClickable) onRowClick(row);
+                if (isClickable) onRowClick(row, rowIndex);
               }}
             >
               {columns.map(col => (

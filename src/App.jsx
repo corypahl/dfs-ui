@@ -5,14 +5,26 @@ import Table from "./components/table";
 const DATA_URL =
   "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
 
-// define exactly 5 columns for your lineup table
+// Define the 6 columns for the lineup table
 const lineupColumns = [
   { Header: "Position", accessor: "position" },
-  { Header: "Player", accessor: "player" },
-  { Header: "Team", accessor: "team" },
-  { Header: "Salary", accessor: "salary" },
-  { Header: "Points", accessor: "points" },
+  { Header: "Player",   accessor: "player"   },
+  { Header: "Team",     accessor: "team"     },
+  { Header: "Salary",   accessor: "salary"   },
+  { Header: "Fpts",     accessor: "fpts"     },
+  { Header: "Grade",    accessor: "grade"    },
 ];
+
+// Map lineup slots to acceptable player positions
+const positionMap = {
+  "P":    ["SP", "RP"],
+  "C/1B": ["C", "1B"],
+  "2B":   ["2B"],
+  "3B":   ["3B"],
+  "SS":   ["SS"],
+  "OF":   ["LF", "CF", "RF"],
+  "UTIL": ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"],
+};
 
 export default function App() {
   const [players, setPlayers] = useState([]);
@@ -21,56 +33,58 @@ export default function App() {
 
   useEffect(() => {
     fetch(DATA_URL)
-      .then((res) => res.json())
-      .then((data) => {
-        // 1) load all players & derive their columns
+      .then(res => res.json())
+      .then(data => {
+        // Load players and derive columns
         setPlayers(data.Players);
-        const cols = Object.keys(data.Players[0]).map((key) => ({
+        const cols = Object.keys(data.Players[0]).map(key => ({
           Header: key,
           accessor: key,
         }));
         setPlayerColumns(cols);
 
-        // 2) build initial, empty lineup slots from your config
+        // Initialize lineup slots
         const cfg = data.Config[0];
-        const slots = cfg.Lineup.split(",").map((pos) => ({
+        const slots = cfg.Lineup.split(",").map(pos => ({
           position: pos,
-          player: "",
-          team: "",
-          salary: 0,
-          points: 0,
+          player:  "",
+          team:    "",
+          salary:  0,
+          fpts:    0,
+          grade:   "",
         }));
         setLineup(slots);
       })
       .catch(console.error);
   }, []);
 
-  // add a player into the first empty slot
+  // Add a player into the first compatible empty slot
   function addToLineup(playerObj) {
-    setLineup((curr) => {
+    setLineup(curr => {
+      const idx = curr.findIndex(slot =>
+        !slot.player && (positionMap[slot.position] || [slot.position]).includes(playerObj.Pos)
+      );
+      if (idx === -1) return curr;
       const next = [...curr];
-      const emptyIdx = next.findIndex((s) => !s.player);
-      if (emptyIdx === -1) return curr; // all slots full
-      next[emptyIdx] = {
-        position: next[emptyIdx].position,
+      next[idx] = {
+        ...next[idx],
         player: playerObj.Player,
-        team: playerObj.Team,
+        team:   playerObj.Team,
         salary: playerObj.Salary ?? 0,
-        points: playerObj.Points ?? 0,
+        fpts:   playerObj.Fpts ?? 0,
+        grade:  playerObj.Grade ?? "",
       };
       return next;
     });
   }
 
-  // clear a slot when clicked in the lineup table
-  function removeFromLineup(slot) {
-    setLineup((curr) =>
-      curr.map((s) =>
-        s.position === slot.position
-          ? { position: s.position, player: "", team: "", salary: 0, points: 0 }
-          : s
-      )
-    );
+  // Remove a player from a specific slot (by index)
+  function removeFromLineup(_, index) {
+    setLineup(curr => {
+      const next = [...curr];
+      next[index] = { ...next[index], player: "", team: "", salary: 0, fpts: 0, grade: "" };
+      return next;
+    });
   }
 
   if (!playerColumns.length || !lineup.length) {
@@ -96,8 +110,14 @@ export default function App() {
           columns={playerColumns}
           data={players}
           onRowClick={addToLineup}
-          disabledRow={(player) =>
-            lineup.some((slot) => slot.player === player.Player)
+          disabledRow={player =>
+            // disable if already in lineup or no slot accepts them
+            lineup.some(slot => slot.player === player.Player) ||
+            !lineup.some(
+              slot =>
+                !slot.player &&
+                (positionMap[slot.position] || [slot.position]).includes(player.Pos)
+            )
           }
         />
       </section>
