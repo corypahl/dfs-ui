@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import Table from "./components/table";
 
@@ -24,31 +23,29 @@ export default function App() {
   const [disabledPositions, setDisabledPositions] = useState([]);
   const [sortKey, setSortKey] = useState("");
   const [sortDir, setSortDir] = useState("asc");
+  const [salaryCap, setSalaryCap] = useState(0);
 
-  // Fetch data from API
+  // Fetch data from API and initialize state
   useEffect(() => {
     fetch(DATA_URL)
       .then(res => res.json())
       .then(data => {
         const cfg = data.Config[0];
-        // Positions for filter buttons
         setPositions(cfg.Positions.split(","));
-        // Parse positionMap
         try {
           const mapObj = JSON.parse(cfg.Map.replace(/'/g, '"'));
           setPositionMap(mapObj);
         } catch (err) {
           console.error("Error parsing position map:", err);
         }
-        // Players and columns
         setPlayers(data.Players);
-        const cols = Object.keys(data.Players[0]).map(key => ({
-          Header: key,
-          accessor: key,
-          sortable: true,
-        }));
-        setPlayerColumns(cols);
-        // Initialize lineup slots
+        setPlayerColumns(
+          Object.keys(data.Players[0]).map(key => ({
+            Header: key,
+            accessor: key,
+            sortable: true,
+          }))
+        );
         const slots = cfg.Lineup.split(",").map(pos => ({
           position: pos,
           player:  "",
@@ -58,14 +55,40 @@ export default function App() {
           grade:   "",
         }));
         setLineup(slots);
+        setSalaryCap(Number(cfg.Salary) || 0);
       })
       .catch(console.error);
   }, []);
 
+  // Append a total row whenever lineup changes
+  const lineupWithTotal = useMemo(() => {
+    const totalSalary = lineup.reduce((sum, slot) => sum + (slot.salary || 0), 0);
+    const totalFpts   = lineup.reduce((sum, slot) => sum + (slot.fpts   || 0), 0);
+    return [
+      ...lineup,
+      {
+        position: "Total",
+        player:   "",
+        team:     "",
+        salary:   totalSalary,
+        fpts:     totalFpts,
+        grade:    "",
+      }
+    ];
+  }, [lineup]);
+
+  // Compute remaining salary and average per open slot
+  const { remainingSalary, openSlots, avgPerSlot } = useMemo(() => {
+    const totalSalary = lineup.reduce((sum, slot) => sum + (slot.salary || 0), 0);
+    const open = lineup.filter(slot => !slot.player).length;
+    const remaining = salaryCap - totalSalary;
+    const avg = open > 0 ? remaining / open : 0;
+    return { remainingSalary: remaining, openSlots: open, avgPerSlot: avg };
+  }, [lineup, salaryCap]);
+
   // Filter and sort players
   const filteredSortedPlayers = useMemo(() => {
     let list = [...players];
-    // Exclude players matching any disabled position filter
     if (disabledPositions.length) {
       list = list.filter(p =>
         !disabledPositions.some(slotPos => {
@@ -74,7 +97,6 @@ export default function App() {
         })
       );
     }
-    // Sorting
     if (sortKey) {
       list.sort((a, b) => {
         const aVal = a[sortKey];
@@ -87,14 +109,12 @@ export default function App() {
     return list;
   }, [players, disabledPositions, sortKey, sortDir, positionMap]);
 
-  // Toggle a position filter on/off
   const togglePosition = pos => {
     setDisabledPositions(curr =>
       curr.includes(pos) ? curr.filter(p => p !== pos) : [...curr, pos]
     );
   };
 
-  // Sort by column header click
   const handleSort = accessor => {
     if (sortKey === accessor) {
       setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
@@ -104,7 +124,6 @@ export default function App() {
     }
   };
 
-  // Add player to lineup
   function addToLineup(playerObj) {
     setLineup(curr => {
       const idx = curr.findIndex(slot =>
@@ -117,14 +136,13 @@ export default function App() {
         player: playerObj.Player,
         team:   playerObj.Team,
         salary: playerObj.Salary ?? 0,
-        fpts:   playerObj.Fpts ?? 0,
-        grade:  playerObj.Grade ?? "",
+        fpts:   playerObj.Fpts   ?? 0,
+        grade:  playerObj.Grade  ?? "",
       };
       return next;
     });
   }
 
-  // Remove player from specific slot
   function removeFromLineup(_, idx) {
     setLineup(curr => {
       const next = [...curr];
@@ -144,7 +162,28 @@ export default function App() {
 
       <section>
         <h2>My Lineup (click to remove)</h2>
-        <Table columns={lineupColumns} data={lineup} onRowClick={removeFromLineup} />
+        <Table
+          columns={lineupColumns}
+          data={lineupWithTotal}
+          onRowClick={removeFromLineup}
+          disabledRow={row => row.position === "Total"}
+        />
+        <div className="lineup-stats">
+          <p>
+            Remaining Salary: {remainingSalary.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0,
+            })}
+          </p>
+          <p>
+            Average per Slot: {avgPerSlot.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0,
+            })} {openSlots > 0 && `(across ${openSlots} slots)`}
+          </p>
+        </div>
       </section>
 
       <section>
