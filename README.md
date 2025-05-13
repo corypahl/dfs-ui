@@ -1,12 +1,36 @@
-# React + Vite
+# DFS Lineup Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + Vite web app for building Daily Fantasy Sports lineups. Pulls player data from a Google Sheets backend and lets users sort, filter, and construct valid lineups based on position rules and salary cap.
 
-Currently, two official plugins are available:
+🌐 **Live Site**: [https://corypahl.github.io/dfs-ui](https://corypahl.github.io/dfs-ui)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🧩 Custom table for interactive lineup building
+- 🔍 Position filtering and sorting
+- ➕ Add/remove players with click
+- 💵 Salary cap tracking and remaining value calc
+- ✨ Visual indicators for selected players
+- 🚀 Fast build with Vite + React
+- 📡 Live Google Sheets integration
+
+---
+
+## 🔧 NPM Lifecycle Commands
+
+These are the core `npm` scripts used for working with the project:
+
+| Command             | Description                                              |
+|---------------------|----------------------------------------------------------|
+| `npm install`       | Install all dependencies                                 |
+| `npm run dev`       | Start local dev server at `localhost:5173`              |
+| `npm run build`     | Generate production-ready `dist/` folder                 |
+| `npm run preview`   | Serve the last build locally (mimics GitHub Pages)       |
+| `npm run deploy`    | Deploy `dist/` to GitHub Pages (`gh-pages` branch)       |
+
+To test a production build locally:
+
+```bash
+npm run build && npm run preview
