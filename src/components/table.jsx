@@ -1,5 +1,5 @@
 // src/components/Table.jsx
-import React from 'react';
+import React from "react";
 
 /**
  * A generic table component with sorting, filtering, and custom formatting.
@@ -20,22 +20,27 @@ export default function Table({
   onHeaderClick,
   sortKey,
   sortDir,
+  selectedPlayers = [],
 }) {
   return (
     <table>
       <thead>
         <tr>
-          {columns.map(col => {
-            const isSortable = col.sortable && typeof onHeaderClick === 'function';
+          {columns.map((col) => {
+            const isSortable =
+              col.sortable && typeof onHeaderClick === "function";
             const isActive = sortKey === col.accessor;
-            const arrow = isActive ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+            const arrow = isActive ? (sortDir === "asc" ? " ▲" : " ▼") : "";
             return (
               <th
                 key={col.accessor}
-                className={isSortable ? 'sortable' : ''}
-                onClick={isSortable ? () => onHeaderClick(col.accessor) : undefined}
+                className={isSortable ? "sortable" : ""}
+                onClick={
+                  isSortable ? () => onHeaderClick(col.accessor) : undefined
+                }
               >
-                {col.Header}{arrow}
+                {col.Header}
+                {arrow}
               </th>
             );
           })}
@@ -43,30 +48,39 @@ export default function Table({
       </thead>
       <tbody>
         {data.map((row, rowIndex) => {
-          const isDisabled = typeof disabledRow === 'function' && disabledRow(row);
-          const isClickable = typeof onRowClick === 'function' && !isDisabled;
+          const isDisabled =
+            typeof disabledRow === "function" && disabledRow(row);
+          const isClickable = typeof onRowClick === "function" && !isDisabled;
           const rowClasses = [];
-          if (isDisabled) rowClasses.push('disabled');
-          else if (isClickable) rowClasses.push('clickable');
+          if (isDisabled) rowClasses.push("disabled");
+          else if (isClickable) rowClasses.push("clickable");
+          if (selectedPlayers.includes(row.Player)) {
+            rowClasses.push("selected-player");
+          }
+          console.log("Row Player:", row.Player);
+          console.log("Selected List:", selectedPlayers);
+          console.log("Match:", selectedPlayers.includes(row.Player));
 
           return (
             <tr
               key={rowIndex}
-              className={rowClasses.join(' ')}
-              onClick={isClickable ? () => onRowClick(row, rowIndex) : undefined}
+              className={rowClasses.join(" ")}
+              onClick={
+                isClickable ? () => onRowClick(row, rowIndex) : undefined
+              }
             >
-              {columns.map(col => {
+              {columns.map((col) => {
                 let cell = row[col.accessor];
-                if (typeof cell === 'number') {
+                if (typeof cell === "number") {
                   const keyLower = col.accessor.toLowerCase();
-                  if (keyLower === 'fpts') {
+                  if (keyLower === "fpts") {
                     cell = cell.toFixed(1);
-                  } else if (keyLower === 'value') {
+                  } else if (keyLower === "value") {
                     cell = cell.toFixed(2);
-                  } else if (keyLower === 'salary') {
-                    cell = cell.toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
+                  } else if (keyLower === "salary") {
+                    cell = cell.toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
                       minimumFractionDigits: 0,
                     });
                   }

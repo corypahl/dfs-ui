@@ -214,6 +214,7 @@ export default function App() {
           onHeaderClick={handleSort}
           sortKey={sortKey}
           sortDir={sortDir}
+          selectedPlayers={lineup.map(slot => slot.player)}
         />
       </section>
     </main>

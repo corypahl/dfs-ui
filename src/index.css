@@ -71,3 +71,8 @@ th.sortable {
 th.sortable:hover {
   text-decoration: underline;
 }
+
+tr.selected-player td {
+  background-color: #007bbd;
+  color: #ffffff;
+}
