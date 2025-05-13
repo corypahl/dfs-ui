@@ -216,6 +216,9 @@ export default function App() {
           sortDir={sortDir}
         />
       </section>
+      <div id="footer">
+        <p>Version 0.0.1</p>
+      </div>
     </main>
   );
 }
