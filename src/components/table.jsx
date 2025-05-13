@@ -4,7 +4,7 @@ import React from "react";
 /**
  * A generic table component with sorting, filtering, and custom formatting.
  * Props:
- * - columns: Array of { Header: string, accessor: string, sortable?: boolean }
+ * - columns: Array of { Header: string, accessor: string, sortable?: boolean, Cell?: function }
  * - data: Array of data objects matching accessors
  * - onRowClick: optional function(row, rowIndex) callback when a row is clicked
  * - disabledRow: optional function(row) returning true to disable a row
@@ -57,9 +57,6 @@ export default function Table({
           if (selectedPlayers.includes(row.Player)) {
             rowClasses.push("selected-player");
           }
-          console.log("Row Player:", row.Player);
-          console.log("Selected List:", selectedPlayers);
-          console.log("Match:", selectedPlayers.includes(row.Player));
 
           return (
             <tr
@@ -70,8 +67,12 @@ export default function Table({
               }
             >
               {columns.map((col) => {
-                let cell = row[col.accessor];
-                if (typeof cell === "number") {
+                const rawValue = row[col.accessor];
+                let cell = rawValue;
+
+                if (typeof col.Cell === "function") {
+                  cell = col.Cell({ value: rawValue, row });
+                } else if (typeof cell === "number") {
                   const keyLower = col.accessor.toLowerCase();
                   if (keyLower === "fpts") {
                     cell = cell.toFixed(1);
@@ -85,6 +86,7 @@ export default function Table({
                     });
                   }
                 }
+
                 return <td key={col.accessor}>{cell}</td>;
               })}
             </tr>
