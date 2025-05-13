@@ -161,7 +161,7 @@ export default function App() {
       <h1>DFS Lineup Builder</h1>
 
       <section>
-        <h2>My Lineup (click to remove)</h2>
+        <h2>My Lineup</h2>
         <Table
           columns={lineupColumns}
           data={lineupWithTotal}
@@ -187,7 +187,7 @@ export default function App() {
       </section>
 
       <section>
-        <h2>All Players (click to add)</h2>
+        <h2>All Players</h2>
         <div className="table-controls">
           {positions.map(pos => (
             <button
@@ -216,9 +216,6 @@ export default function App() {
           sortDir={sortDir}
         />
       </section>
-      <div id="footer">
-        <p>Version 0.0.1</p>
-      </div>
     </main>
   );
 }
