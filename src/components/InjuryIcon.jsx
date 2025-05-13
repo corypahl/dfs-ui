@@ -10,7 +10,7 @@ const InjuryIcon = ({ details }) => {
         style={{ marginLeft: '6px', cursor: 'pointer' }}
         title="Tap for injury info"
       >
-        🏥
+        🚑
       </span>
       {show && (
         <div
