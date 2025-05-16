@@ -1,17 +1,7 @@
 // src/components/Table.jsx
 import React from "react";
+import InjuryIcon from "./InjuryIcon";
 
-/**
- * A generic table component with sorting, filtering, and custom formatting.
- * Props:
- * - columns: Array of { Header: string, accessor: string, sortable?: boolean, Cell?: function }
- * - data: Array of data objects matching accessors
- * - onRowClick: optional function(row, rowIndex) callback when a row is clicked
- * - disabledRow: optional function(row) returning true to disable a row
- * - onHeaderClick: optional function(accessor) for sortable headers
- * - sortKey: string key currently sorted
- * - sortDir: 'asc' | 'desc'
- */
 export default function Table({
   columns = [],
   data = [],
@@ -50,28 +40,20 @@ export default function Table({
         {data.map((row, rowIndex) => {
           const isDisabled =
             typeof disabledRow === "function" && disabledRow(row);
-          const isClickable = typeof onRowClick === "function" && !isDisabled;
           const rowClasses = [];
           if (isDisabled) rowClasses.push("disabled");
-          else if (isClickable) rowClasses.push("clickable");
           if (selectedPlayers.includes(row.Player)) {
             rowClasses.push("selected-player");
           }
 
           return (
-            <tr
-              key={rowIndex}
-              className={rowClasses.join(" ")}
-              onClick={
-                isClickable ? () => onRowClick(row, rowIndex) : undefined
-              }
-            >
+            <tr key={rowIndex} className={rowClasses.join(" ")}>
               {columns.map((col) => {
                 const rawValue = row[col.accessor];
                 let cell = rawValue;
 
                 if (typeof col.Cell === "function") {
-                  cell = col.Cell({ value: rawValue, row });
+                  cell = col.Cell({ value: rawValue, row, rowIndex });
                 } else if (typeof cell === "number") {
                   const keyLower = col.accessor.toLowerCase();
                   if (keyLower === "fpts") {

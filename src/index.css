@@ -76,3 +76,31 @@ tr.selected-player td {
   background-color: #007bbd;
   color: #ffffff;
 }
+
+.clickable-name {
+  cursor: pointer;
+}
+
+.injury-wrapper {
+  position: relative;
+}
+
+.injury-icon {
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.injury-tooltip {
+  position: absolute;
+  top: 1.5em;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 6px;
+  border-radius: 6px;
+  z-index: 999;
+  width: 200px;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: black;
+}

@@ -5,15 +5,6 @@ import InjuryIcon from "./components/InjuryIcon";
 const DATA_URL =
   "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
 
-const lineupColumns = [
-  { Header: "Position", accessor: "position" },
-  { Header: "Player", accessor: "player" },
-  { Header: "Team", accessor: "team" },
-  { Header: "Salary", accessor: "salary" },
-  { Header: "Fpts", accessor: "fpts" },
-  { Header: "Grade", accessor: "grade" },
-];
-
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [lineup, setLineup] = useState([]);
@@ -24,6 +15,48 @@ export default function App() {
   const [sortDir, setSortDir] = useState("asc");
   const [salaryCap, setSalaryCap] = useState(0);
   const [injuryMap, setInjuryMap] = useState({});
+
+  function removeFromLineup(_, idx) {
+    setLineup((curr) => {
+      const next = [...curr];
+      next[idx] = {
+        ...next[idx],
+        player: "",
+        team: "",
+        salary: 0,
+        fpts: 0,
+        grade: "",
+      };
+      return next;
+    });
+  }
+
+  const lineupColumns = useMemo(
+    () => [
+      { Header: "Position", accessor: "position" },
+      {
+        Header: "Player",
+        accessor: "player",
+        Cell: ({ value, row }) => {
+          return row.position !== "Total" ? (
+            <span
+              onClick={() => removeFromLineup(null, row.index)}
+              className="clickable-name"
+            >
+              {value}
+            </span>
+          ) : (
+            value
+          );
+        },
+      },
+      { Header: "Team", accessor: "team" },
+      { Header: "Salary", accessor: "salary" },
+      { Header: "Fpts", accessor: "fpts" },
+      { Header: "Grade", accessor: "grade" },
+    ],
+    []
+  );
 
   useEffect(() => {
     fetch(DATA_URL)
@@ -39,18 +72,16 @@ export default function App() {
         }
 
         const injuries = data.Injuries || [];
-        const injuryMap = {};
+        const map = {};
         injuries.forEach((inj) => {
           if (inj.Name) {
             const key = inj.Name.trim().toLowerCase();
-            injuryMap[key] = `${inj.Inury || "Injury"} — ${
+            map[key] = `${inj.Inury || "Injury"} — ${
               inj.Status || "Status unknown"
             }`;
           }
         });
-        console.log("Injury map:", injuryMap);
-        setInjuryMap(injuryMap);
-
+        setInjuryMap(map);
         setPlayers(data.Players);
 
         const slots = cfg.Lineup.split(",").map((pos) => ({
@@ -70,25 +101,34 @@ export default function App() {
   const playerColumns = useMemo(() => {
     if (!players.length) return [];
 
-    return Object.keys(players[0]).map((key) => ({
-      Header: key,
-      accessor: key,
-      sortable: true,
-      Cell: ({ value, row }) => {
-        if (key === "Player") {
-          const nameKey = row.Player.trim().toLowerCase();
-          return (
-            <>
-              {value}
-              {injuryMap[nameKey] && (
-                <InjuryIcon details={injuryMap[nameKey]} />
-              )}
-            </>
-          );
-        }
-        return value;
-      },
-    }));
+    return Object.keys(players[0]).map((key) => {
+      const isPlayerColumn = key === "Player";
+      return {
+        Header: key,
+        accessor: key,
+        sortable: true,
+        Cell: isPlayerColumn
+          ? ({ value, row }) => {
+              const nameKey = row.Player.trim().toLowerCase();
+              return (
+                <>
+                  <span
+                    onClick={() => addToLineup(row)}
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    {value}
+                  </span>
+                  {injuryMap[nameKey] && (
+                    <InjuryIcon details={injuryMap[nameKey]} />
+                  )}
+                </>
+              );
+            }
+          : undefined,
+      };
+    });
   }, [players, injuryMap]);
 
   const lineupWithTotal = useMemo(() => {
@@ -98,7 +138,7 @@ export default function App() {
     );
     const totalFpts = lineup.reduce((sum, slot) => sum + (slot.fpts || 0), 0);
     return [
-      ...lineup,
+      ...lineup.map((slot, idx) => ({ ...slot, index: idx })),
       {
         position: "Total",
         player: "",
@@ -182,21 +222,6 @@ export default function App() {
     });
   }
 
-  function removeFromLineup(_, idx) {
-    setLineup((curr) => {
-      const next = [...curr];
-      next[idx] = {
-        ...next[idx],
-        player: "",
-        team: "",
-        salary: 0,
-        fpts: 0,
-        grade: "",
-      };
-      return next;
-    });
-  }
-
   if (!playerColumns.length || !lineup.length) {
     return <div id="loading">Loading…</div>;
   }
@@ -210,7 +235,6 @@ export default function App() {
         <Table
           columns={lineupColumns}
           data={lineupWithTotal}
-          onRowClick={removeFromLineup}
           disabledRow={(row) => row.position === "Total"}
         />
         <div className="lineup-stats">
