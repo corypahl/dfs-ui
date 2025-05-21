@@ -16,6 +16,12 @@ export default function App() {
   const [salaryCap, setSalaryCap] = useState(0);
   const [injuryMap, setInjuryMap] = useState({});
 
+  // keep track of which names are in the lineup
+  const selectedNames = useMemo(
+    () => lineup.map((slot) => slot.player).filter(Boolean),
+    [lineup]
+  );
+
   function removeFromLineup(_, idx) {
     setLineup((curr) => {
       const next = [...curr];
@@ -107,15 +113,20 @@ export default function App() {
         Header: key,
         accessor: key,
         sortable: true,
+        // only the Player column needs special disabling logic
         Cell: isPlayerColumn
           ? ({ value, row }) => {
               const nameKey = row.Player.trim().toLowerCase();
+              const isSelected = selectedNames.includes(row.Player);
               return (
                 <>
                   <span
-                    onClick={() => addToLineup(row)}
+                    onClick={() => {
+                      if (!isSelected) addToLineup(row);
+                    }}
                     style={{
-                      cursor: "pointer",
+                      cursor: isSelected ? "not-allowed" : "pointer",
+                      opacity: isSelected ? 0.5 : 1,
                     }}
                   >
                     {value}
@@ -125,11 +136,11 @@ export default function App() {
                   )}
                 </>
               );
-            }
+          }
           : undefined,
       };
     });
-  }, [players, injuryMap]);
+  }, [players, injuryMap, selectedNames]);
 
   const lineupWithTotal = useMemo(() => {
     const totalSalary = lineup.reduce(
@@ -290,7 +301,7 @@ export default function App() {
           onHeaderClick={handleSort}
           sortKey={sortKey}
           sortDir={sortDir}
-          selectedPlayers={lineup.map((slot) => slot.player)}
+          selectedPlayers={selectedNames}
         />
       </section>
     </main>
