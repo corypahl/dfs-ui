@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 
 // Create an icon component that exactly follows the InjuryIcon pattern
 const MatchupIcon = ({ matchup, children }) => {
+  const [show, setShow] = useState(false);
+  
   // We need to convert matchup data to a single string detail
   if (!matchup) return children;
-  
-  const [show, setShow] = useState(false);
   
   // Create a formatted string from the matchup data
   const { opponent, spread, total, gameTime } = matchup;

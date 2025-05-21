@@ -1,11 +1,9 @@
 // src/components/Table.jsx
 import React from "react";
-import InjuryIcon from "./InjuryIcon";
 
 export default function Table({
   columns = [],
   data = [],
-  onRowClick,
   disabledRow,
   onHeaderClick,
   sortKey,
