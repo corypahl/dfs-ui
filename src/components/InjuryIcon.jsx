@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 const InjuryIcon = ({ details }) => {
   const [show, setShow] = useState(false);
 

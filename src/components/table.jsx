@@ -42,7 +42,7 @@ export default function Table({
             typeof disabledRow === "function" && disabledRow(row);
           const rowClasses = [];
           if (isDisabled) rowClasses.push("disabled");
-          if (selectedPlayers.includes(row.Player)) {
+          if (selectedPlayers.includes(row.Player) || selectedPlayers.includes(row.player)) {
             rowClasses.push("selected-player");
           }
 
