@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import Table from "./components/table";
-import InjuryIcon from "./components/InjuryIcon";
-import MatchupIcon from "./components/MatchupIcon";
+import InjuryTooltip from "./components/./InjuryTooltip.jsx";
+import MatchupTooltip from "./components/MatchupTooltip.jsx";
 
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -65,9 +65,9 @@ export default function App() {
                     if (!value) return value;
                     const matchup = matchupMap[value];
                     return (
-                        <MatchupIcon matchup={matchup}>
+                        <MatchupTooltip matchup={matchup}>
                             {value}
-                        </MatchupIcon>
+                        </MatchupTooltip>
                     );
                 }
             },
@@ -156,7 +156,7 @@ export default function App() {
                                     {value}
                                 </span>
                                 {injuryMap[nameKey] && (
-                                    <InjuryIcon details={injuryMap[nameKey]}/>
+                                    <InjuryTooltip details={injuryMap[nameKey]}/>
                                 )}
                             </>
                         );
@@ -174,9 +174,9 @@ export default function App() {
                         if (!value) return value;
                         const matchup = matchupMap[value];
                         return (
-                            <MatchupIcon matchup={matchup}>
+                            <MatchupTooltip matchup={matchup}>
                                 {value}
-                            </MatchupIcon>
+                            </MatchupTooltip>
                         );
                     }
                 };

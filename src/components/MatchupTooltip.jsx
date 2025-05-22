@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-// Create an icon component that exactly follows the InjuryIcon pattern
-const MatchupIcon = ({ matchup, children }) => {
+// Create an icon component that exactly follows the InjuryTooltip pattern
+const MatchupTooltip = ({ matchup, children }) => {
   const [show, setShow] = useState(false);
   
   // We need to convert matchup data to a single string detail
@@ -43,4 +43,4 @@ const MatchupIcon = ({ matchup, children }) => {
   );
 };
 
-export default MatchupIcon;
+export default MatchupTooltip;

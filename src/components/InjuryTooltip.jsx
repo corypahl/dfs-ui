@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-const InjuryIcon = ({ details }) => {
+const InjuryTooltip = ({ details }) => {
   const [show, setShow] = useState(false);
 
   return (
@@ -20,4 +20,4 @@ const InjuryIcon = ({ details }) => {
   );
 };
 
-export default InjuryIcon;
+export default InjuryTooltip;
