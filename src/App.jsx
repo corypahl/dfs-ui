@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState, useCallback} from "react";
 import Table from "./components/table";
 import InjuryTooltip from "./components/./InjuryTooltip.jsx";
 import MatchupTooltip from "./components/MatchupTooltip.jsx";
+import Shortlist from "./components/Shortlist.jsx";
 
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -341,6 +342,22 @@ export default function App() {
                 </div>
             </section>
 
+                            <hr className="section-divider" />
+                            
+                            <section>
+                                <Shortlist
+                    players={filteredSortedPlayers}
+                    lineup={lineup}
+                    positionMap={positionMap}
+                    avgPerSlot={avgPerSlot}
+                    addToLineup={addToLineup}
+                    selectedNames={selectedNames}
+                    sortKey={sortKey}
+                    sortDir={sortDir}
+                    onHeaderClick={handleSort}
+                />
+                            </section>
+                            
                             <hr className="section-divider" />
                 
             <section>
