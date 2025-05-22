@@ -189,40 +189,64 @@ tr.selected-player td {
   text-decoration: underline dotted;
 }
 
-/* Tooltip and injury styles */
-.injury-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.injury-icon {
-  margin-left: 6px;
-  cursor: pointer;
-}
-
+/* Tooltips */
 .injury-tooltip {
   position: absolute;
-  z-index: 9999;
+  top: 1.8em;
+  left: 0;
+  z-index: 1000;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   padding: 10px;
-  text-align: left;
   white-space: pre-line;
-  top: -5px;
-  left: 100%;
-  margin-left: 5px;
   font-size: 12px;
   min-width: 150px;
   color: black;
+  margin-top: 4px;
+}
+
+.news-tooltip {
+  position: absolute;
+  top: 1.8em;
+  left: 100%;
+  margin-left: 6px;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 10px;
+  white-space: pre-line;
+  font-size: 12px;
+  min-width: 150px;
+  color: black;
+  margin-top: 4px;
+}
+
+.injury-wrapper,
+.news-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 2px;
+}
+
+.injury-icon,
+.news-icon {
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.tooltip-holder {
+  position: relative;
+  display: inline-block;
 }
 
 /* Section divider */
 .section-divider {
   border: 0;
   height: 1px;
-  background: #333;
-  background-image: linear-gradient(to right, var(--bg), var(--accent), var(--bg));
+  background: #333 linear-gradient(to right, var(--bg), var(--accent), var(--bg));
   margin: 2rem 0;
 }

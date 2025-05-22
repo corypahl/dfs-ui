@@ -1,7 +1,8 @@
-import React, {useEffect, useMemo, useState, useCallback} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import Table from "./components/table";
 import InjuryTooltip from "./components/./InjuryTooltip.jsx";
 import MatchupTooltip from "./components/MatchupTooltip.jsx";
+import NewsTooltip from "./components/NewsTooltip.jsx";
 import Shortlist from "./components/Shortlist.jsx";
 
 const DATA_URL =
@@ -19,6 +20,7 @@ export default function App() {
     const [maxSalary, setMaxSalary] = useState("");
     const [injuryMap, setInjuryMap] = useState({});
     const [matchupMap, setMatchupMap] = useState({});
+    const [newsMap, setNewsMap] = useState({});
 
     // keep track of which names are in the lineup
     const selectedNames = useMemo(
@@ -61,7 +63,7 @@ export default function App() {
                 },
             },
             {
-                Header: "Team", 
+                Header: "Team",
                 accessor: "team",
                 Cell: ({value}) => {
                     if (!value) return value;
@@ -93,17 +95,16 @@ export default function App() {
                 }
 
                 const injuries = data.Injuries || [];
-                const map = {};
+                const injuryMap = {};
                 injuries.forEach((inj) => {
                     if (inj.Name) {
                         const key = inj.Name.trim().toLowerCase();
-                        map[key] = `${inj.Inury || "Injury"} — ${
+                        injuryMap[key] = `${inj.Inury || "Injury"} — ${
                             inj.Status || "Status unknown"
                         }`;
                     }
                 });
-                setInjuryMap(map);
-                setPlayers(data.Players);
+                setInjuryMap(injuryMap);
 
                 const matchups = data.Matchups || [];
                 const matchupMap = {};
@@ -116,6 +117,18 @@ export default function App() {
                     };
                 });
                 setMatchupMap(matchupMap);
+
+                const news = data.News || [];
+                const newsMap = {};
+                news.forEach((article) => {
+                    if (article.Name) {
+                        const key = article.Name.trim().toLowerCase();
+                        newsMap[key] = `${article.News || "News"}`;
+                    }
+                });
+                setNewsMap(newsMap);
+
+                setPlayers(data.Players);
 
                 const slots = cfg.Lineup.split(",").map((pos) => ({
                     position: pos,
@@ -153,12 +166,12 @@ export default function App() {
             return next;
         });
     }, [positionMap]);
-    
+
     const playerColumns = useMemo(() => {
         if (!players.length) return [];
 
         return Object.keys(players[0]).map((key) => {
-            // Player column with injury icon
+            // Player column with injury and news icons
             if (key === "Player") {
                 return {
                     Header: key,
@@ -168,27 +181,32 @@ export default function App() {
                         const nameKey = row.Player.trim().toLowerCase();
                         const isSelected = selectedNames.includes(row.Player);
                         return (
-                            <>
-                                <span
-                                    onClick={() => {
-                                        if (!isSelected) addToLineup(row);
-                                    }}
-                                    style={{
-                                        cursor: isSelected ? "not-allowed" : "pointer",
-                                        opacity: isSelected ? 0.5 : 1,
-                                    }}
-                                >
-                                    {value}
-                                </span>
-                                {injuryMap[nameKey] && (
-                                    <InjuryTooltip details={injuryMap[nameKey]}/>
-                                )}
-                            </>
+                            <div style={{display: "inline-flex", alignItems: "center"}}>
+                              <span
+                                  onClick={() => {
+                                      if (!isSelected) addToLineup(row);
+                                  }}
+                                  className="clickable-name"
+                                  style={{
+                                      cursor: isSelected ? "not-allowed" : "pointer",
+                                      opacity: isSelected ? 0.5 : 1,
+                                  }}
+                              >
+                                {value}
+                              </span>
+                                {/* Tooltip Icons - isolate each with its own relative block container */}
+                                <div style={{position: "relative", display: "inline-block"}}>
+                                    {injuryMap[nameKey] && <InjuryTooltip details={injuryMap[nameKey]}/>}
+                                </div>
+                                <div style={{position: "relative", display: "inline-block"}}>
+                                    {newsMap[nameKey] && <NewsTooltip details={newsMap[nameKey]}/>}
+                                </div>
+                            </div>
                         );
                     }
                 };
             }
-            
+
             // Team column with matchup tooltip
             if (key === "Team") {
                 return {
@@ -206,7 +224,7 @@ export default function App() {
                     }
                 };
             }
-            
+
             // Default column renderer
             return {
                 Header: key,
@@ -214,9 +232,9 @@ export default function App() {
                 sortable: true
             };
         });
-    }, [players, injuryMap, selectedNames, matchupMap, addToLineup]);
+    }, [players, injuryMap, selectedNames, matchupMap, addToLineup, newsMap]);
 
-    
+
     const lineupWithTotal = useMemo(() => {
         const totalSalary = lineup.reduce(
             (sum, slot) => sum + (slot.salary || 0),
@@ -235,7 +253,7 @@ export default function App() {
             },
         ];
     }, [lineup]);
-    
+
     const {remainingSalary, openSlots, avgPerSlot, lineupStatus} = useMemo(() => {
         const totalSalary = lineup.reduce(
             (sum, slot) => sum + (slot.salary || 0),
@@ -244,7 +262,7 @@ export default function App() {
         const open = lineup.filter((slot) => !slot.player).length;
         const remaining = salaryCap - totalSalary;
         const avg = open > 0 ? remaining / open : 0;
-        
+
         // Determine lineup status for styling
         let status = "";
         if (remaining < 0) {
@@ -252,15 +270,15 @@ export default function App() {
         } else if (open === 0) {
             status = "valid-lineup";
         }
-        
+
         return {
-            remainingSalary: remaining, 
-            openSlots: open, 
+            remainingSalary: remaining,
+            openSlots: open,
             avgPerSlot: avg,
             lineupStatus: status
         };
     }, [lineup, salaryCap]);
-    
+
     const filteredSortedPlayers = useMemo(() => {
         let list = [...players];
         if (disabledPositions.length) {
@@ -272,12 +290,12 @@ export default function App() {
                     })
             );
         }
-        
+
         // Filter by maxSalary if provided
         if (maxSalary && !isNaN(maxSalary) && maxSalary > 0) {
             list = list.filter(p => p.Salary <= Number(maxSalary));
         }
-        
+
         if (sortKey) {
             list.sort((a, b) => {
                 const aVal = a[sortKey];
@@ -289,13 +307,13 @@ export default function App() {
         }
         return list;
     }, [players, disabledPositions, sortKey, sortDir, positionMap, maxSalary]);
-    
+
     const togglePosition = (pos) => {
         setDisabledPositions((curr) =>
             curr.includes(pos) ? curr.filter((p) => p !== pos) : [...curr, pos]
         );
     };
-    
+
     const handleSort = (accessor) => {
         if (sortKey === accessor) {
             setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -342,10 +360,10 @@ export default function App() {
                 </div>
             </section>
 
-                            <hr className="section-divider" />
-                            
-                            <section>
-                                <Shortlist
+            <hr className="section-divider"/>
+
+            <section>
+                <Shortlist
                     players={filteredSortedPlayers}
                     lineup={lineup}
                     positionMap={positionMap}
@@ -356,10 +374,10 @@ export default function App() {
                     sortDir={sortDir}
                     onHeaderClick={handleSort}
                 />
-                            </section>
-                            
-                            <hr className="section-divider" />
-                
+            </section>
+
+            <hr className="section-divider"/>
+
             <section>
                 <h2>All Players</h2>
                 <div className="table-controls">
