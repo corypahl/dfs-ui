@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState, useCallback} from "react";
 import Table from "./components/table";
 import InjuryTooltip from "./components/./InjuryTooltip.jsx";
 import MatchupTooltip from "./components/MatchupTooltip.jsx";
@@ -15,6 +15,7 @@ export default function App() {
     const [sortKey, setSortKey] = useState("");
     const [sortDir, setSortDir] = useState("asc");
     const [salaryCap, setSalaryCap] = useState(0);
+    const [maxSalary, setMaxSalary] = useState("");
     const [injuryMap, setInjuryMap] = useState({});
     const [matchupMap, setMatchupMap] = useState({});
 
@@ -24,7 +25,7 @@ export default function App() {
         [lineup]
     );
 
-    function removeFromLineup(_, idx) {
+    const removeFromLineup = useCallback((_, idx) => {
         setLineup((curr) => {
             const next = [...curr];
             next[idx] = {
@@ -37,7 +38,7 @@ export default function App() {
             };
             return next;
         });
-    }
+    }, []);
 
     const lineupColumns = useMemo(() => {
         return [
@@ -75,7 +76,7 @@ export default function App() {
             {Header: "Fpts", accessor: "fpts"},
             {Header: "Grade", accessor: "grade"},
         ];
-    }, [removeFromLineup, matchupMap]);
+    }, [matchupMap, removeFromLineup]);
 
     useEffect(() => {
         fetch(DATA_URL)
@@ -129,6 +130,29 @@ export default function App() {
             .catch(console.error);
     }, []);
 
+    const addToLineup = useCallback((playerObj) => {
+        setLineup((curr) => {
+            const idx = curr.findIndex(
+                (slot) =>
+                    !slot.player &&
+                    (positionMap[slot.position] || [slot.position]).includes(
+                        playerObj.Pos
+                    )
+            );
+            if (idx === -1) return curr;
+            const next = [...curr];
+            next[idx] = {
+                ...next[idx],
+                player: playerObj.Player,
+                team: playerObj.Team,
+                salary: playerObj.Salary ?? 0,
+                fpts: playerObj.Fpts ?? 0,
+                grade: playerObj.Grade ?? "",
+            };
+            return next;
+        });
+    }, [positionMap]);
+    
     const playerColumns = useMemo(() => {
         if (!players.length) return [];
 
@@ -170,7 +194,7 @@ export default function App() {
                     Header: key,
                     accessor: key,
                     sortable: true,
-                    Cell: ({value, row}) => {
+                    Cell: ({value}) => {
                         if (!value) return value;
                         const matchup = matchupMap[value];
                         return (
@@ -189,8 +213,9 @@ export default function App() {
                 sortable: true
             };
         });
-    }, [players, injuryMap, selectedNames, addToLineup, matchupMap]);
+    }, [players, injuryMap, selectedNames, matchupMap, addToLineup]);
 
+    
     const lineupWithTotal = useMemo(() => {
         const totalSalary = lineup.reduce(
             (sum, slot) => sum + (slot.salary || 0),
@@ -209,7 +234,7 @@ export default function App() {
             },
         ];
     }, [lineup]);
-
+    
     const {remainingSalary, openSlots, avgPerSlot} = useMemo(() => {
         const totalSalary = lineup.reduce(
             (sum, slot) => sum + (slot.salary || 0),
@@ -220,7 +245,7 @@ export default function App() {
         const avg = open > 0 ? remaining / open : 0;
         return {remainingSalary: remaining, openSlots: open, avgPerSlot: avg};
     }, [lineup, salaryCap]);
-
+    
     const filteredSortedPlayers = useMemo(() => {
         let list = [...players];
         if (disabledPositions.length) {
@@ -232,6 +257,12 @@ export default function App() {
                     })
             );
         }
+        
+        // Filter by maxSalary if provided
+        if (maxSalary && !isNaN(maxSalary) && maxSalary > 0) {
+            list = list.filter(p => p.Salary <= Number(maxSalary));
+        }
+        
         if (sortKey) {
             list.sort((a, b) => {
                 const aVal = a[sortKey];
@@ -242,14 +273,14 @@ export default function App() {
             });
         }
         return list;
-    }, [players, disabledPositions, sortKey, sortDir, positionMap]);
-
+    }, [players, disabledPositions, sortKey, sortDir, positionMap, maxSalary]);
+    
     const togglePosition = (pos) => {
         setDisabledPositions((curr) =>
             curr.includes(pos) ? curr.filter((p) => p !== pos) : [...curr, pos]
         );
     };
-
+    
     const handleSort = (accessor) => {
         if (sortKey === accessor) {
             setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -258,29 +289,6 @@ export default function App() {
             setSortDir("asc");
         }
     };
-
-    function addToLineup(playerObj) {
-        setLineup((curr) => {
-            const idx = curr.findIndex(
-                (slot) =>
-                    !slot.player &&
-                    (positionMap[slot.position] || [slot.position]).includes(
-                        playerObj.Pos
-                    )
-            );
-            if (idx === -1) return curr;
-            const next = [...curr];
-            next[idx] = {
-                ...next[idx],
-                player: playerObj.Player,
-                team: playerObj.Team,
-                salary: playerObj.Salary ?? 0,
-                fpts: playerObj.Fpts ?? 0,
-                grade: playerObj.Grade ?? "",
-            };
-            return next;
-        });
-    }
 
     if (!playerColumns.length || !lineup.length) {
         return <div id="loading">Loading…</div>;
@@ -332,6 +340,16 @@ export default function App() {
                             {pos}
                         </button>
                     ))}
+                    <div className="filter-input">
+                        <label htmlFor="max-salary">Max Salary:</label>
+                        <input
+                            id="max-salary"
+                            type="number"
+                            placeholder="Enter max salary"
+                            value={maxSalary}
+                            onChange={(e) => setMaxSalary(e.target.value)}
+                        />
+                    </div>
                 </div>
                 <Table
                     columns={playerColumns}

@@ -62,7 +62,33 @@ tr.clickable:hover {
 tr.disabled {
   opacity: 0.5;
 }
+/* Add styling for the filter input in table controls */
+.filter-input {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
 
+.filter-input label {
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.filter-input input {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 120px;
+  font-size: 0.9rem;
+}
+
+/* Adjust table controls to accommodate the new filter */
+.table-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
 th.sortable {
   cursor: pointer;
   user-select: none;
