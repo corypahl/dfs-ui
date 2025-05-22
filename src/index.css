@@ -11,6 +11,52 @@ body {
   padding: 1rem;
 }
 
+/* Root container styles */
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Logo animations */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* Card components */
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
 /* Filter Buttons */
 .table-controls {
   display: flex;
@@ -62,6 +108,7 @@ tr.clickable:hover {
 tr.disabled {
   opacity: 0.5;
 }
+
 /* Add styling for the filter input in table controls */
 .filter-input {
   display: flex;
@@ -89,6 +136,7 @@ tr.disabled {
   flex-wrap: wrap;
   margin-bottom: 1rem;
 }
+
 th.sortable {
   cursor: pointer;
   user-select: none;
@@ -107,8 +155,17 @@ tr.selected-player td {
   cursor: pointer;
 }
 
+/* Team and clickable text styling */
+.clickable-team {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: underline dotted;
+}
+
+/* Tooltip and injury styles */
 .injury-wrapper {
   position: relative;
+  display: inline-block;
 }
 
 .injury-icon {
@@ -118,15 +175,27 @@ tr.selected-player td {
 
 .injury-tooltip {
   position: absolute;
-  top: 1.5em;
-  left: 0;
-  background: #fff;
+  z-index: 9999;
+  background-color: white;
   border: 1px solid #ccc;
-  padding: 6px;
-  border-radius: 6px;
-  z-index: 999;
-  width: 200px;
-  font-size: 0.85rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 10px;
+  text-align: left;
+  white-space: pre-line;
+  top: -5px;
+  left: 100%;
+  margin-left: 5px;
+  font-size: 12px;
+  min-width: 150px;
   color: black;
+}
+
+/* Section divider */
+.section-divider {
+  border: 0;
+  height: 1px;
+  background: #333;
+  background-image: linear-gradient(to right, var(--bg), var(--accent), var(--bg));
+  margin: 2rem 0;
 }

@@ -326,6 +326,8 @@ export default function App() {
                 </div>
             </section>
 
+                            <hr className="section-divider" />
+                
             <section>
                 <h2>All Players</h2>
                 <div className="table-controls">
