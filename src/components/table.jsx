@@ -9,9 +9,10 @@ export default function Table({
   sortKey,
   sortDir,
   selectedPlayers = [],
+  className = "",
 }) {
   return (
-    <table>
+    <table className={className}>
       <thead>
         <tr>
           {columns.map((col) => {
@@ -43,6 +44,8 @@ export default function Table({
           if (selectedPlayers.includes(row.Player) || selectedPlayers.includes(row.player)) {
             rowClasses.push("selected-player");
           }
+          
+          // Salary exceeded is now handled at the table level
 
           return (
             <tr key={rowIndex} className={rowClasses.join(" ")}>

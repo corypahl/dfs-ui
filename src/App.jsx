@@ -235,7 +235,7 @@ export default function App() {
         ];
     }, [lineup]);
     
-    const {remainingSalary, openSlots, avgPerSlot} = useMemo(() => {
+    const {remainingSalary, openSlots, avgPerSlot, lineupStatus} = useMemo(() => {
         const totalSalary = lineup.reduce(
             (sum, slot) => sum + (slot.salary || 0),
             0
@@ -243,7 +243,21 @@ export default function App() {
         const open = lineup.filter((slot) => !slot.player).length;
         const remaining = salaryCap - totalSalary;
         const avg = open > 0 ? remaining / open : 0;
-        return {remainingSalary: remaining, openSlots: open, avgPerSlot: avg};
+        
+        // Determine lineup status for styling
+        let status = "";
+        if (remaining < 0) {
+            status = "salary-exceeded";
+        } else if (open === 0) {
+            status = "valid-lineup";
+        }
+        
+        return {
+            remainingSalary: remaining, 
+            openSlots: open, 
+            avgPerSlot: avg,
+            lineupStatus: status
+        };
     }, [lineup, salaryCap]);
     
     const filteredSortedPlayers = useMemo(() => {
@@ -304,9 +318,10 @@ export default function App() {
                     columns={lineupColumns}
                     data={lineupWithTotal}
                     disabledRow={(row) => row.position === "Total"}
+                    className={lineupStatus}
                 />
                 <div className="lineup-stats">
-                    <p>
+                    <p className={remainingSalary < 0 ? "negative-salary" : (lineupStatus === "valid-lineup" ? "valid-salary" : "")}>
                         Remaining Salary:{" "}
                         {remainingSalary.toLocaleString("en-US", {
                             style: "currency",
@@ -314,7 +329,7 @@ export default function App() {
                             minimumFractionDigits: 0,
                         })}
                     </p>
-                    <p>
+                    <p className={remainingSalary < 0 ? "negative-salary" : (lineupStatus === "valid-lineup" ? "valid-salary" : "")}>
                         Average per Slot:{" "}
                         {avgPerSlot.toLocaleString("en-US", {
                             style: "currency",
@@ -371,6 +386,7 @@ export default function App() {
                     sortKey={sortKey}
                     sortDir={sortDir}
                     selectedPlayers={selectedNames}
+                    className={lineupStatus}
                 />
             </section>
         </main>

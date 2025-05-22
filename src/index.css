@@ -91,6 +91,16 @@ table {
   margin-bottom: 1.5rem;
 }
 
+table.salary-exceeded {
+  border: 3px solid rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+table.valid-lineup {
+  border: 3px solid rgba(0, 200, 0, 0.7);
+  box-shadow: 0 0 10px rgba(0, 200, 0, 0.5);
+}
+
 thead {
   background-color: #1e1e1e;
 }
@@ -98,7 +108,7 @@ thead {
 th, td {
   padding: 0.75rem;
   border: 1px solid #333;
-  text-align: left;
+  text-align: center;
 }
 
 tr.clickable:hover {
@@ -153,6 +163,16 @@ tr.selected-player td {
 
 .clickable-name {
   cursor: pointer;
+}
+
+.negative-salary {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+.valid-salary {
+  color: #4caf50;
+  font-weight: bold;
 }
 
 /* Team and clickable text styling */
