@@ -1,0 +1,89 @@
+/* Global variables */
+:root {
+  --bg: #121212;
+  --fg: #e0e0e0;
+  --accent: #009cf1;
+}
+
+/* Base styles */
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: sans-serif;
+  padding: 1rem;
+}
+
+/* Root container styles */
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Common layout elements */
+.section-divider {
+  border: 0;
+  height: 1px;
+  background: #333 linear-gradient(to right, var(--bg), var(--accent), var(--bg));
+  margin: 2rem 0;
+}
+
+/* Page sections */
+section {
+  margin: 2rem 0;
+}
+
+h1 {
+  color: var(--accent);
+  margin-bottom: 2rem;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-size: 1.5rem;
+}
+
+h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+/* Loading indicator */
+#loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+
+/* Generic tooltip container */
+.tooltip-holder {
+  position: relative;
+  display: inline-block;
+}
+
+/* Button and input styles */
+button {
+  background-color: #1a1a1a;
+  color: var(--fg);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #2a2a2a;
+}
+
+input {
+  background-color: #1a1a1a;
+  color: var(--fg);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.5rem;
+}

@@ -1,0 +1,85 @@
+/* Table component styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid transparent; /* Default transparent border */
+}
+
+thead {
+  background-color: #1a1a1a;
+}
+
+th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+th.sortable {
+  cursor: pointer;
+}
+
+th.sortable:hover {
+  background-color: #2a2a2a;
+}
+
+td {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #333;
+}
+
+tbody tr:hover {
+  background-color: #1a1a1a;
+}
+
+tr.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.selected-player {
+  background-color: rgba(0, 156, 241, 0.1);
+}
+
+.clickable-name {
+  cursor: pointer;
+}
+
+/* Table status styling with !important to override any conflicting styles */
+table.salary-exceeded {
+  border: 4px solid #ff4a4a !important;
+  box-shadow: 0 0 10px rgba(255, 74, 74, 0.5) !important;
+}
+
+table.valid-lineup {
+  border: 4px solid #4aff4a !important;
+  box-shadow: 0 0 10px rgba(74, 255, 74, 0.5) !important;
+}
+
+/* Specific table styling */
+.lineup-table {
+  /* Distinct styling for lineup table if needed */
+}
+
+.players-table {
+  /* Distinct styling for players table if needed */
+}
+
+/* Combined selectors for better specificity */
+.lineup-table.salary-exceeded,
+.players-table.salary-exceeded {
+  border: 4px solid #ff4a4a !important;
+  box-shadow: 0 0 10px rgba(255, 74, 74, 0.5) !important;
+}
+
+.lineup-table.valid-lineup,
+.players-table.valid-lineup {
+  border: 4px solid #4aff4a !important;
+  box-shadow: 0 0 10px rgba(74, 255, 74, 0.5) !important;
+}
+
+/* Remove table-controls styles that were duplicated here */

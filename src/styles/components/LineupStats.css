@@ -1,0 +1,20 @@
+.lineup-stats {
+  /* Add any specific layout styles for the container if needed */
+  /* For example, margin, padding, text-align */
+  margin-top: 1rem;
+  text-align: left; /* Or center, depending on desired look */
+}
+
+.lineup-stats p {
+  margin: 0.5rem 0;
+}
+
+.negative-salary {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+.valid-salary {
+  color: #4caf50;
+  font-weight: bold;
+}
