@@ -5,7 +5,8 @@ import MatchupTooltip from "./components/MatchupTooltip.jsx";
 import NewsTooltip from "./components/NewsTooltip.jsx";
 import Shortlist from "./components/Shortlist.jsx";
 import LineupStats from "./components/LineupStats.jsx";
-import './App.css';
+import './styles/global.css';
+import './styles/components/TableControls.css';
 
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -265,12 +266,18 @@ export default function App() {
         const openSlots = lineup.filter((slot) => !slot.player).length;
         const remainingSalary = salaryCap - totalSalary;
 
+        let status = "";
         if (remainingSalary < 0) {
-            return "salary-exceeded";
+            status = "salary-exceeded";
         } else if (openSlots === 0) {
-            return "valid-lineup";
+            status = "valid-lineup";
         }
-        return ""; // Default: no specific border styling for the table
+        
+        console.log("Lineup Status:", status, 
+            "openSlots:", openSlots, 
+            "remainingSalary:", remainingSalary);
+        
+        return status; // Default: no specific border styling for the table
     }, [lineup, salaryCap]);
 
     // avgPerSlot is needed for Shortlist, so calculate it here or pass it down from LineupStats
@@ -353,13 +360,13 @@ export default function App() {
                     columns={lineupColumns}
                     data={lineupWithTotal}
                     disabledRow={(row) => row.position === "Total"}
-                    className={lineupStatus} // This lineupStatus is for table border styling
+                    className={`lineup-table ${lineupStatus}`} // Add a base class and the status
                 />
                 <LineupStats lineup={lineup} salaryCap={salaryCap} />
             </section>
-
+            
             <hr className="section-divider"/>
-
+            
             <section>
                 <Shortlist
                     players={filteredSortedPlayers}
@@ -373,9 +380,9 @@ export default function App() {
                     onHeaderClick={handleSort}
                 />
             </section>
-
+            
             <hr className="section-divider"/>
-
+            
             <section>
                 <h2>All Players</h2>
                 <div className="table-controls">
@@ -419,7 +426,7 @@ export default function App() {
                     sortKey={sortKey}
                     sortDir={sortDir}
                     selectedPlayers={selectedNames}
-                    className={lineupStatus}
+                    className={`players-table ${lineupStatus}`} // Add a base class and the status
                 />
             </section>
         </main>

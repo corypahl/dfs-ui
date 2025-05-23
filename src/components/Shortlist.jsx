@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import Table from './table';
-import './Shortlist.css';
+import '../styles/components/Shortlist.css';
 
 const Shortlist = ({ 
   players, 
@@ -118,11 +118,11 @@ const Shortlist = ({
 
   return (
     <div className="shortlist">
-      <h3>Shortlist (Salary ≤ {avgPerSlot.toLocaleString("en-US", {
+      <h2>Shortlist (Salary ≤ {avgPerSlot.toLocaleString("en-US", {
           style: "currency",
           currency: "USD",
           minimumFractionDigits: 0,
-        })})</h3>
+        })})</h2>
       <Table
         columns={columns}
         data={recommendedPlayers}

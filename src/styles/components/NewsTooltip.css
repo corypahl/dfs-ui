@@ -1,0 +1,38 @@
+.news-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.news-icon {
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.news-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  z-index: 10;
+  min-width: 200px;
+  max-width: 300px;
+  white-space: normal;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.news-tooltip:before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}

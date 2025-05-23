@@ -1,0 +1,11 @@
+.shortlist {
+  margin: 1rem 0;
+}
+
+.recommended-player {
+  background-color: rgba(74, 255, 74, 0.1);
+}
+
+.recommended-player:hover {
+  background-color: rgba(74, 255, 74, 0.2);
+}

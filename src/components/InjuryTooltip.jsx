@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './InjuryTooltip.css';
+import '../styles/components/InjuryTooltip.css';
 
 const InjuryTooltip = ({ details }) => {
   const [show, setShow] = useState(false);

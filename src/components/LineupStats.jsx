@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import './LineupStats.css';
+import '../styles/components/LineupStats.css';
 
 const LineupStats = ({ lineup, salaryCap }) => {
   const { remainingSalary, openSlots, avgPerSlot, lineupStatus } = useMemo(() => {

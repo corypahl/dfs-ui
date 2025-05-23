@@ -1,6 +1,6 @@
 // src/components/Table.jsx
 import React from "react";
-import './Table.css';
+import '../styles/components/Table.css';
 
 export default function Table({
   columns = [],
@@ -12,6 +12,9 @@ export default function Table({
   selectedPlayers = [],
   className = "",
 }) {
+  // Log the className for debugging
+  console.log("Table className:", className);
+  
   return (
     <table className={className}>
       <thead>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './MatchupTooltip.css';
+import '../styles/components/MatchupTooltip.css';
 
 // Create an icon component that exactly follows the InjuryTooltip pattern
 const MatchupTooltip = ({ matchup, children }) => {

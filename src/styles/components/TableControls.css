@@ -1,0 +1,57 @@
+/* Table controls and filters */
+.table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  background-color: #1a1a1a;
+  color: var(--fg);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background-color: #2a2a2a;
+}
+
+/* Active (non-disabled) tab styling */
+.tab:not(.disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: rgba(0, 156, 241, 0.1);
+}
+
+.tab.disabled {
+  opacity: 0.5;
+  text-decoration: line-through;
+  background-color: #1a1a1a;
+  color: var(--fg);
+  border-color: #333;
+}
+
+.filter-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.filter-input input {
+  background-color: #1a1a1a;
+  color: var(--fg);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 120px;
+}
+
+.filter-input label {
+  font-size: 0.9rem;
+}
