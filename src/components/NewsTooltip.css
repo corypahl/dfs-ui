@@ -1,0 +1,28 @@
+.news-tooltip {
+  position: absolute;
+  top: 1.8em;
+  left: 100%;
+  margin-left: 6px;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 10px;
+  white-space: pre-line;
+  font-size: 12px;
+  min-width: 150px;
+  color: black;
+  margin-top: 4px;
+}
+
+.news-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 2px;
+}
+
+.news-icon {
+  margin-left: 6px;
+  cursor: pointer;
+}

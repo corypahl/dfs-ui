@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import Table from './table';
+import './Shortlist.css';
 
 const Shortlist = ({ 
   players, 

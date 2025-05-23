@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import './NewsTooltip.css';
+
 const NewsTooltip = ({ details }) => {
   const [show, setShow] = useState(false);
 

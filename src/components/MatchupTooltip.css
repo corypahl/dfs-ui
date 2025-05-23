@@ -1,0 +1,28 @@
+/* Styles for MatchupTooltip, similar to InjuryTooltip */
+.injury-tooltip { /* Used by MatchupTooltip for its tooltip display */
+  position: absolute;
+  top: 1.8em;
+  left: 0; /* Default, but often overridden by inline styles or specific component logic */
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 10px;
+  white-space: pre-line;
+  font-size: 12px;
+  min-width: 150px;
+  color: black;
+  margin-top: 4px;
+}
+
+.injury-wrapper { /* Used by MatchupTooltip for its wrapper */
+  position: relative;
+  display: inline-block;
+  margin-left: 2px;
+}
+
+.injury-icon { /* Used by MatchupTooltip for the clickable icon/children area */
+  margin-left: 6px;
+  cursor: pointer;
+}

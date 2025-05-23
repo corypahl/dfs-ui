@@ -4,6 +4,8 @@ import InjuryTooltip from "./components/./InjuryTooltip.jsx";
 import MatchupTooltip from "./components/MatchupTooltip.jsx";
 import NewsTooltip from "./components/NewsTooltip.jsx";
 import Shortlist from "./components/Shortlist.jsx";
+import LineupStats from "./components/LineupStats.jsx";
+import './App.css';
 
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -254,30 +256,44 @@ export default function App() {
         ];
     }, [lineup]);
 
-    const {remainingSalary, openSlots, avgPerSlot, lineupStatus} = useMemo(() => {
+    // Calculate lineupStatus for main Table styling (salary-exceeded, valid-lineup)
+    const lineupStatus = useMemo(() => {
         const totalSalary = lineup.reduce(
+            (sum, slot) => sum + (slot.salary || 0),
+            0
+        );
+        const openSlots = lineup.filter((slot) => !slot.player).length;
+        const remainingSalary = salaryCap - totalSalary;
+
+        if (remainingSalary < 0) {
+            return "salary-exceeded";
+        } else if (openSlots === 0) {
+            return "valid-lineup";
+        }
+        return ""; // Default: no specific border styling for the table
+    }, [lineup, salaryCap]);
+
+    // avgPerSlot is needed for Shortlist, so calculate it here or pass it down from LineupStats
+    // For now, let's keep avgPerSlot calculation for Shortlist here to minimize changes to Shortlist props
+    // Or, LineupStats could provide it via a render prop or context if it grew more complex.
+    // Simpler for now: recalculate avgPerSlot specifically for Shortlist if not available otherwise.
+    // Actually, Shortlist already receives avgPerSlot. This means the original useMemo needs to provide it.
+    // Let's refine: the original useMemo can provide avgPerSlot, and LineupStats will also calculate it internally.
+    // OR, App.jsx calculates all values needed by its direct children (Table, Shortlist),
+    // and LineupStats calculates all values it needs for its own display. This is cleaner.
+
+    const { avgPerSlot } = useMemo(() => {
+         const totalSalary = lineup.reduce(
             (sum, slot) => sum + (slot.salary || 0),
             0
         );
         const open = lineup.filter((slot) => !slot.player).length;
         const remaining = salaryCap - totalSalary;
-        const avg = open > 0 ? remaining / open : 0;
-
-        // Determine lineup status for styling
-        let status = "";
-        if (remaining < 0) {
-            status = "salary-exceeded";
-        } else if (open === 0) {
-            status = "valid-lineup";
-        }
-
-        return {
-            remainingSalary: remaining,
-            openSlots: open,
-            avgPerSlot: avg,
-            lineupStatus: status
+        return { 
+            avgPerSlot: open > 0 ? remaining / open : 0,
         };
     }, [lineup, salaryCap]);
+
 
     const filteredSortedPlayers = useMemo(() => {
         let list = [...players];
@@ -337,27 +353,9 @@ export default function App() {
                     columns={lineupColumns}
                     data={lineupWithTotal}
                     disabledRow={(row) => row.position === "Total"}
-                    className={lineupStatus}
+                    className={lineupStatus} // This lineupStatus is for table border styling
                 />
-                <div className="lineup-stats">
-                    <p className={remainingSalary < 0 ? "negative-salary" : (lineupStatus === "valid-lineup" ? "valid-salary" : "")}>
-                        Remaining Salary:{" "}
-                        {remainingSalary.toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "USD",
-                            minimumFractionDigits: 0,
-                        })}
-                    </p>
-                    <p className={remainingSalary < 0 ? "negative-salary" : (lineupStatus === "valid-lineup" ? "valid-salary" : "")}>
-                        Average per Slot:{" "}
-                        {avgPerSlot.toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "USD",
-                            minimumFractionDigits: 0,
-                        })}{" "}
-                        {openSlots > 0 && `(across ${openSlots} slots)`}
-                    </p>
-                </div>
+                <LineupStats lineup={lineup} salaryCap={salaryCap} />
             </section>
 
             <hr className="section-divider"/>

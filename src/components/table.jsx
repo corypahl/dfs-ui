@@ -1,5 +1,6 @@
 // src/components/Table.jsx
 import React from "react";
+import './Table.css';
 
 export default function Table({
   columns = [],
