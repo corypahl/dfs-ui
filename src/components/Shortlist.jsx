@@ -88,7 +88,7 @@ const Shortlist = ({
     });
     
     return recommendations;
-  }, [players, availablePositions, avgPerSlot, selectedNames, positionGroups]); // Added positionGroups
+  }, [players, availablePositions, avgPerSlot, selectedNames]);
 
   const columns = useMemo(() => {
     // Ensure columns are generated even if players array is initially empty but recommendations might have placeholders
