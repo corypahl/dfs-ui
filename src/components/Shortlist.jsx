@@ -25,8 +25,6 @@ const Shortlist = ({
   const recommendedPlayers = useMemo(() => {
     if (!players.length || !availablePositions.length) return [];
 
-    console.log('[Shortlist Debug] avgPerSlot:', avgPerSlot);
-
     // Group players by position
     const positionGroups = {};
     
@@ -41,29 +39,16 @@ const Shortlist = ({
     const recommendations = [];
     
     availablePositions.forEach(({ position, allowedPositions }) => {
-      if (position === 'P') { // START LOGGING FOR PITCHER SLOT
-        console.log(`[Shortlist Debug P-Slot] Processing available P slot. Allowed player positions:`, allowedPositions);
-      }
       let bestPlayer = null;
       let highestOverall = -1;
       
       allowedPositions.forEach(pos => {
-        if (position === 'P') { // Log only for the P available slot
-          console.log(`[Shortlist Debug P-Slot] Checking allowed player position: ${pos}`); // Logs "SP", then "RP"
-          const playersForPos = positionGroups[pos] || [];
-          console.log(`[Shortlist Debug P-Slot] Players in positionGroups['${pos}']:`, playersForPos);
-        }
-
         const eligiblePlayers = (positionGroups[pos] || []).filter(player => 
           // Must not be already in lineup
           !selectedNames.includes(player.Player) && 
           // Must be within salary cap
           player.Salary <= avgPerSlot
         );
-
-        if (position === 'P') {
-          console.log(`[Shortlist Debug P-Slot] Eligible players for ${pos} (after salary <= ${avgPerSlot} and availability filter):`, eligiblePlayers);
-        }
         
         eligiblePlayers.forEach(player => {
           const overall = parseFloat(player.Overall || 0);
@@ -73,11 +58,6 @@ const Shortlist = ({
           }
         });
       });
-
-      if (position === 'P') {
-        console.log('[Shortlist Debug P-Slot] Best player found for P slot:', bestPlayer);
-        console.log('[Shortlist Debug P-Slot] Highest overall for P slot:', highestOverall);
-      }
       
       if (bestPlayer) {
         recommendations.push(bestPlayer);
