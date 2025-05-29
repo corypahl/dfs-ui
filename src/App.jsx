@@ -13,11 +13,46 @@ const DATA_URL =
 
 // Helper function to calculate letter grade
 function calculateGrade(overallScore) {
-  if (overallScore >= 90) return "A";
-  if (overallScore >= 80) return "B";
-  if (overallScore >= 70) return "C";
-  if (overallScore >= 60) return "D";
-  return "F";
+  if (overallScore <= 0) {
+    return ""; // Return empty string if overall is not positive
+  }
+  if (overallScore >= 97) {
+    return "A+";
+  }
+  if (overallScore >= 93) {
+    return "A";
+  }
+  if (overallScore >= 90) {
+    return "A-";
+  }
+  if (overallScore >= 87) {
+    return "B+";
+  }
+  if (overallScore >= 83) {
+    return "B";
+  }
+  if (overallScore >= 80) {
+    return "B-";
+  }
+  if (overallScore >= 77) {
+    return "C+";
+  }
+  if (overallScore >= 73) {
+    return "C";
+  }
+  if (overallScore >= 70) {
+    return "C-";
+  }
+  if (overallScore >= 67) {
+    return "D+";
+  }
+  if (overallScore >= 63) {
+    return "D";
+  }
+  if (overallScore >= 60) {
+    return "D-";
+  }
+  return "F"; // For scores less than 60 but greater than 0
 }
 
 export default function App() {
