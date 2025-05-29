@@ -372,15 +372,6 @@ export default function App() {
     const togglePosition = (pos) => {
         setDisabledPositions((curr) =>
             curr.includes(pos) ? curr.filter((p) => p !== pos) : [...curr, pos]
-                return 0;
-            });
-        }
-        return list;
-    }, [players, disabledPositions, sortKey, sortDir, positionMap, maxSalary]);
-
-    const togglePosition = (pos) => {
-        setDisabledPositions((curr) =>
-            curr.includes(pos) ? curr.filter((p) => p !== pos) : [...curr, pos]
         );
     };
 
