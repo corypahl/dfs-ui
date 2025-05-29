@@ -21,6 +21,7 @@ export default function App() {
     const [sortDir, setSortDir] = useState("asc");
     const [salaryCap, setSalaryCap] = useState(0);
     const [maxSalary, setMaxSalary] = useState("");
+    const [weightingFactor, setWeightingFactor] = useState(0.5); // Added weightingFactor state
     const [injuryMap, setInjuryMap] = useState({});
     const [matchupMap, setMatchupMap] = useState({});
     const [newsMap, setNewsMap] = useState({});
@@ -131,7 +132,17 @@ export default function App() {
                 });
                 setNewsMap(newsMap);
 
-                setPlayers(data.Players);
+                // Calculate Overall for each player
+                const playersWithOverall = data.Players.map(player => {
+                    const fptsGrade = player['Fpts Grade'];
+                    const valGrade = player['Val Grade'];
+                    let overall = 0; // Default Overall
+                    if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
+                        overall = (fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor));
+                    }
+                    return { ...player, Overall: overall };
+                });
+                setPlayers(playersWithOverall);
 
                 const slots = cfg.Lineup.split(",").map((pos) => ({
                     position: pos,
@@ -319,12 +330,48 @@ export default function App() {
             list = list.filter(p => p.Salary <= Number(maxSalary));
         }
 
+        // Recalculate Overall if weightingFactor changes, directly on the current list
+        // This is important if players state is not re-fetched but weightingFactor changes
+        // However, the primary calculation is done on fetch. This ensures Overall updates if factor changes live.
+        list = list.map(player => {
+            const fptsGrade = player['Fpts Grade'];
+            const valGrade = player['Val Grade'];
+            let overall = player.Overall; // Keep existing if calculation isn't possible
+            if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
+                overall = (fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor));
+            } else if (overall === undefined) { // Ensure Overall is set if not previously
+                overall = 0;
+            }
+            return { ...player, Overall: overall };
+        });
+
         if (sortKey) {
             list.sort((a, b) => {
                 const aVal = a[sortKey];
                 const bVal = b[sortKey];
-                if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
-                if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+
+                // Handle potential NaN or undefined values in sorting
+                const aIsValid = typeof aVal === 'number' && !isNaN(aVal);
+                const bIsValid = typeof bVal === 'number' && !isNaN(bVal);
+
+                if (aIsValid && bIsValid) {
+                    if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
+                    if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+                } else if (aIsValid) {
+                    return -1; // Valid numbers come before invalid/NaN
+                } else if (bIsValid) {
+                    return 1;  // Valid numbers come before invalid/NaN
+                }
+                // If both are invalid or equal, maintain order or consider them equal
+                return 0;
+            });
+        }
+        return list;
+    }, [players, disabledPositions, sortKey, sortDir, positionMap, maxSalary, weightingFactor]); // Add weightingFactor to dependency array
+
+    const togglePosition = (pos) => {
+        setDisabledPositions((curr) =>
+            curr.includes(pos) ? curr.filter((p) => p !== pos) : [...curr, pos]
                 return 0;
             });
         }
@@ -406,6 +453,21 @@ export default function App() {
                             value={maxSalary}
                             onChange={(e) => setMaxSalary(e.target.value)}
                         />
+                    </div>
+                    <div className="filter-input">
+                        <label htmlFor="weighting-factor">Overall Weighting:</label>
+                        <input
+                            id="weighting-factor"
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={weightingFactor}
+                            onChange={(e) => setWeightingFactor(parseFloat(e.target.value))}
+                        />
+                        <span>
+                            Fpts: {Math.round(weightingFactor * 100)}% / Val: {Math.round((1 - weightingFactor) * 100)}%
+                        </span>
                     </div>
                 </div>
                 <Table
