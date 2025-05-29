@@ -11,6 +11,50 @@ import './styles/components/TableControls.css';
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
 
+// Helper function to calculate letter grade
+function calculateGrade(overallScore) {
+  if (overallScore <= 0) {
+    return ""; // Return empty string if overall is not positive
+  }
+  if (overallScore >= 97) {
+    return "A+";
+  }
+  if (overallScore >= 93) {
+    return "A";
+  }
+  if (overallScore >= 90) {
+    return "A-";
+  }
+  if (overallScore >= 87) {
+    return "B+";
+  }
+  if (overallScore >= 83) {
+    return "B";
+  }
+  if (overallScore >= 80) {
+    return "B-";
+  }
+  if (overallScore >= 77) {
+    return "C+";
+  }
+  if (overallScore >= 73) {
+    return "C";
+  }
+  if (overallScore >= 70) {
+    return "C-";
+  }
+  if (overallScore >= 67) {
+    return "D+";
+  }
+  if (overallScore >= 63) {
+    return "D";
+  }
+  if (overallScore >= 60) {
+    return "D-";
+  }
+  return "F"; // For scores less than 60 but greater than 0
+}
+
 export default function App() {
     const [players, setPlayers] = useState([]);
     const [lineup, setLineup] = useState([]);
@@ -21,6 +65,7 @@ export default function App() {
     const [sortDir, setSortDir] = useState("asc");
     const [salaryCap, setSalaryCap] = useState(0);
     const [maxSalary, setMaxSalary] = useState("");
+    const [weightingFactor, setWeightingFactor] = useState(0.5); // Added weightingFactor state
     const [injuryMap, setInjuryMap] = useState({});
     const [matchupMap, setMatchupMap] = useState({});
     const [newsMap, setNewsMap] = useState({});
@@ -131,7 +176,20 @@ export default function App() {
                 });
                 setNewsMap(newsMap);
 
-                setPlayers(data.Players);
+                // Calculate Overall for each player
+                const playersWithOverall = data.Players.map(player => {
+                    const fptsGrade = player['Fpts Grade'];
+                    const valGrade = player['Val Grade'];
+                    let overall = 0; // Default Overall
+                    if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
+                        overall = Math.round((fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor)));
+                    }
+                    // If player.Overall already existed and was a number (e.g. from source), round it too.
+                    // However, current logic calculates fresh or defaults to 0, so Math.round(0) is fine.
+                    const grade = calculateGrade(overall);
+                    return { ...player, Overall: overall, Grade: grade };
+                });
+                setPlayers(playersWithOverall);
 
                 const slots = cfg.Lineup.split(",").map((pos) => ({
                     position: pos,
@@ -319,17 +377,51 @@ export default function App() {
             list = list.filter(p => p.Salary <= Number(maxSalary));
         }
 
+        // Recalculate Overall if weightingFactor changes, directly on the current list
+        // This is important if players state is not re-fetched but weightingFactor changes
+        // However, the primary calculation is done on fetch. This ensures Overall updates if factor changes live.
+        list = list.map(player => {
+            const fptsGrade = player['Fpts Grade'];
+            const valGrade = player['Val Grade'];
+            let newOverall;
+            if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
+                newOverall = Math.round((fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor)));
+            } else if (typeof player.Overall === 'number') {
+                // If new calculation is not possible, but an old 'Overall' exists and is a number, round it.
+                // This handles cases where 'Overall' might have been loaded with decimals from source,
+                // or if fptsGrade/valGrade become invalid later.
+                newOverall = Math.round(player.Overall);
+            } else {
+                // Default to 0 if no valid grades and no pre-existing valid Overall.
+                newOverall = 0;
+            }
+            const newGrade = calculateGrade(newOverall);
+            return { ...player, Overall: newOverall, Grade: newGrade };
+        });
+
         if (sortKey) {
             list.sort((a, b) => {
                 const aVal = a[sortKey];
                 const bVal = b[sortKey];
-                if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
-                if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+
+                // Handle potential NaN or undefined values in sorting
+                const aIsValid = typeof aVal === 'number' && !isNaN(aVal);
+                const bIsValid = typeof bVal === 'number' && !isNaN(bVal);
+
+                if (aIsValid && bIsValid) {
+                    if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
+                    if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+                } else if (aIsValid) {
+                    return -1; // Valid numbers come before invalid/NaN
+                } else if (bIsValid) {
+                    return 1;  // Valid numbers come before invalid/NaN
+                }
+                // If both are invalid or equal, maintain order or consider them equal
                 return 0;
             });
         }
         return list;
-    }, [players, disabledPositions, sortKey, sortDir, positionMap, maxSalary]);
+    }, [players, disabledPositions, sortKey, sortDir, positionMap, maxSalary, weightingFactor]); // Add weightingFactor to dependency array
 
     const togglePosition = (pos) => {
         setDisabledPositions((curr) =>
@@ -406,6 +498,20 @@ export default function App() {
                             value={maxSalary}
                             onChange={(e) => setMaxSalary(e.target.value)}
                         />
+                    </div>
+                    <div className="filter-input" style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ marginRight: '8px' }}>Fpts</span>
+                        <input
+                            id="weighting-factor"
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={weightingFactor}
+                            onChange={(e) => setWeightingFactor(parseFloat(e.target.value))}
+                            style={{ flexGrow: 1 }}
+                        />
+                        <span style={{ marginLeft: '8px' }}>Val</span>
                     </div>
                 </div>
                 <Table
