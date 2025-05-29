@@ -182,7 +182,7 @@ export default function App() {
                     const valGrade = player['Val Grade'];
                     let overall = 0; // Default Overall
                     if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
-                        overall = Math.round((fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor)));
+                        overall = Math.round((fptsGrade * (1 - weightingFactor)) + (valGrade * weightingFactor));
                     }
                     // If player.Overall already existed and was a number (e.g. from source), round it too.
                     // However, current logic calculates fresh or defaults to 0, so Math.round(0) is fine.
@@ -385,7 +385,7 @@ export default function App() {
             const valGrade = player['Val Grade'];
             let newOverall;
             if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
-                newOverall = Math.round((fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor)));
+                newOverall = Math.round((fptsGrade * (1 - weightingFactor)) + (valGrade * weightingFactor));
             } else if (typeof player.Overall === 'number') {
                 // If new calculation is not possible, but an old 'Overall' exists and is a number, round it.
                 // This handles cases where 'Overall' might have been loaded with decimals from source,
