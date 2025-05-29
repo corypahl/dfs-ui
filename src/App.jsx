@@ -11,6 +11,15 @@ import './styles/components/TableControls.css';
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
 
+// Helper function to calculate letter grade
+function calculateGrade(overallScore) {
+  if (overallScore >= 90) return "A";
+  if (overallScore >= 80) return "B";
+  if (overallScore >= 70) return "C";
+  if (overallScore >= 60) return "D";
+  return "F";
+}
+
 export default function App() {
     const [players, setPlayers] = useState([]);
     const [lineup, setLineup] = useState([]);
@@ -142,7 +151,8 @@ export default function App() {
                     }
                     // If player.Overall already existed and was a number (e.g. from source), round it too.
                     // However, current logic calculates fresh or defaults to 0, so Math.round(0) is fine.
-                    return { ...player, Overall: overall };
+                    const grade = calculateGrade(overall);
+                    return { ...player, Overall: overall, Grade: grade };
                 });
                 setPlayers(playersWithOverall);
 
@@ -350,7 +360,8 @@ export default function App() {
                 // Default to 0 if no valid grades and no pre-existing valid Overall.
                 newOverall = 0;
             }
-            return { ...player, Overall: newOverall };
+            const newGrade = calculateGrade(newOverall);
+            return { ...player, Overall: newOverall, Grade: newGrade };
         });
 
         if (sortKey) {
