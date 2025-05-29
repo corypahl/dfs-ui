@@ -499,8 +499,8 @@ export default function App() {
                             onChange={(e) => setMaxSalary(e.target.value)}
                         />
                     </div>
-                    <div className="filter-input">
-                        <label htmlFor="weighting-factor">Overall Weighting:</label>
+                    <div className="filter-input" style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ marginRight: '8px' }}>Fpts</span>
                         <input
                             id="weighting-factor"
                             type="range"
@@ -509,10 +509,9 @@ export default function App() {
                             step="0.01"
                             value={weightingFactor}
                             onChange={(e) => setWeightingFactor(parseFloat(e.target.value))}
+                            style={{ flexGrow: 1 }}
                         />
-                        <span>
-                            Fpts: {Math.round(weightingFactor * 100)}% / Val: {Math.round((1 - weightingFactor) * 100)}%
-                        </span>
+                        <span style={{ marginLeft: '8px' }}>Val</span>
                     </div>
                 </div>
                 <Table
