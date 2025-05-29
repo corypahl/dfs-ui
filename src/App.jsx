@@ -138,8 +138,10 @@ export default function App() {
                     const valGrade = player['Val Grade'];
                     let overall = 0; // Default Overall
                     if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
-                        overall = (fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor));
+                        overall = Math.round((fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor)));
                     }
+                    // If player.Overall already existed and was a number (e.g. from source), round it too.
+                    // However, current logic calculates fresh or defaults to 0, so Math.round(0) is fine.
                     return { ...player, Overall: overall };
                 });
                 setPlayers(playersWithOverall);
@@ -336,13 +338,19 @@ export default function App() {
         list = list.map(player => {
             const fptsGrade = player['Fpts Grade'];
             const valGrade = player['Val Grade'];
-            let overall = player.Overall; // Keep existing if calculation isn't possible
+            let newOverall;
             if (typeof fptsGrade === 'number' && typeof valGrade === 'number') {
-                overall = (fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor));
-            } else if (overall === undefined) { // Ensure Overall is set if not previously
-                overall = 0;
+                newOverall = Math.round((fptsGrade * weightingFactor) + (valGrade * (1 - weightingFactor)));
+            } else if (typeof player.Overall === 'number') {
+                // If new calculation is not possible, but an old 'Overall' exists and is a number, round it.
+                // This handles cases where 'Overall' might have been loaded with decimals from source,
+                // or if fptsGrade/valGrade become invalid later.
+                newOverall = Math.round(player.Overall);
+            } else {
+                // Default to 0 if no valid grades and no pre-existing valid Overall.
+                newOverall = 0;
             }
-            return { ...player, Overall: overall };
+            return { ...player, Overall: newOverall };
         });
 
         if (sortKey) {
