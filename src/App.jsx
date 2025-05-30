@@ -7,6 +7,7 @@ import Shortlist from "./components/Shortlist.jsx";
 import LineupStats from "./components/LineupStats.jsx";
 import './styles/global.css';
 import './styles/components/TableControls.css';
+import './styles/layouts.css';
 
 const DATA_URL =
     "https://script.google.com/macros/s/AKfycbzODSyKW5YZpujVWZMr8EQkpMKRwaKPI_lYiAv2mxDe-dCr9LRfEjt8-wzqBB_X4QKxug/exec";
@@ -110,24 +111,9 @@ export default function App() {
                     );
                 },
             },
-            {
-                Header: "Team",
-                accessor: "team",
-                Cell: ({value}) => {
-                    if (!value) return value;
-                    const matchup = matchupMap[value];
-                    return (
-                        <MatchupTooltip matchup={matchup}>
-                            {value}
-                        </MatchupTooltip>
-                    );
-                }
-            },
-            {Header: "Salary", accessor: "salary"},
-            {Header: "Fpts", accessor: "fpts"},
             {Header: "Grade", accessor: "grade"},
         ];
-    }, [matchupMap, removeFromLineup]);
+    }, [removeFromLineup]);
 
     useEffect(() => {
         fetch(DATA_URL)
@@ -445,40 +431,40 @@ export default function App() {
     return (
         <main>
             <h1>DFS Lineup Builder</h1>
-
-            <section>
-                <h2>My Lineup</h2>
-                <Table
-                    columns={lineupColumns}
-                    data={lineupWithTotal}
-                    disabledRow={(row) => row.position === "Total"}
-                    className={`lineup-table ${lineupStatus}`} // Add a base class and the status
-                />
-                <LineupStats lineup={lineup} salaryCap={salaryCap} />
-            </section>
-            
-            <hr className="section-divider"/>
-            
-            <section>
-                <Shortlist
-                    players={filteredSortedPlayers}
-                    lineup={lineup}
-                    positionMap={positionMap}
-                    avgPerSlot={avgPerSlot}
-                    addToLineup={addToLineup}
-                    selectedNames={selectedNames}
-                    sortKey={sortKey}
-                    sortDir={sortDir}
-                    onHeaderClick={handleSort}
-                />
-            </section>
-            
-            <hr className="section-divider"/>
-            
-            <section>
-                <h2>All Players</h2>
-                <div className="table-controls">
-                    {positions.map((pos) => (
+            <div className="layout-container">
+                <div className="layout-left">
+                    <section> {/* My Lineup */}
+                        <h2>My Lineup</h2>
+                        <Table
+                            columns={lineupColumns}
+                            data={lineupWithTotal}
+                            disabledRow={(row) => row.position === "Total"}
+                            className={`lineup-table ${lineupStatus}`} // Add a base class and the status
+                        />
+                        <LineupStats lineup={lineup} salaryCap={salaryCap} />
+                    </section>
+                </div>
+                <div className="layout-right">
+                    <section> {/* Shortlist */}
+                        <Shortlist
+                            players={filteredSortedPlayers}
+                            lineup={lineup}
+                            positionMap={positionMap}
+                            avgPerSlot={avgPerSlot}
+                            addToLineup={addToLineup}
+                            selectedNames={selectedNames}
+                            sortKey={sortKey}
+                            sortDir={sortDir}
+                            onHeaderClick={handleSort}
+                        />
+                    </section>
+                    
+                    <hr className="section-divider"/>
+                    
+                    <section> {/* All Players */}
+                        <h2>All Players</h2>
+                        <div className="table-controls">
+                            {positions.map((pos) => (
                         <button
                             key={pos}
                             className={

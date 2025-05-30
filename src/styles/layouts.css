@@ -1,0 +1,36 @@
+/* Default mobile-first styles */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-left {
+  flex-basis: 100%;
+  /* or width: 100%; */
+}
+
+.layout-right {
+  flex-basis: 100%;
+  /* or width: 100%; */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Gap between Shortlist and All Players sections */
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .layout-container {
+    flex-direction: row;
+    gap: 20px; /* Gap between left and right columns */
+  }
+
+  .layout-left {
+    flex-basis: 35%;
+    flex-shrink: 1;
+  }
+
+  .layout-right {
+    flex-basis: 65%;
+    flex-shrink: 1;
+  }
+}
